@@ -1,8 +1,58 @@
-# @fastify/multipart
+# @iimm/fastify-multipart
 
-![CI](https://github.com/fastify/fastify-multipart/workflows/CI/badge.svg)
-[![NPM version](https://img.shields.io/npm/v/@fastify/multipart.svg?style=flat)](https://www.npmjs.com/package/@fastify/multipart)
-[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://standardjs.com/)
+[![NPM version](https://img.shields.io/npm/v/@iimm/fastify-multipart.svg?style=flat)](https://www.npmjs.com/package/@iimm/fastify-multipart)
+[![NPM downloads](http://img.shields.io/npm/dm/@iimm/fastify-multipart.svg?style=flat)](https://npmjs.org/package/@iimm/fastify-multipart)
+
+Fastify plugin to parse the multipart content-type. Originly fork from [`@fastify/multipart`](https://github.com/fastify/fastify-multipart) and then add built-in disk mode.
+
+## Version Comparison
+
+| @iimm/fastify-multipart | @fastify/multipart |
+| :----:|:----:|
+|1.0.0|7.5.0|
+
+
+## added options
+```javascript
+  /**file cache store mode: memory/disk(when is disk,files will be auto-resumed and save at lock tmp dir, fileItem object will have a property named 'filepath')
+   * @default 'memory'
+   */
+  cacheLocation?: 'disk' | 'memory';
+  /**files fields attach to body?(only valid when addToBody=true). when is true, file fields will be add into body,otherwise they will be add into request with their field name？
+   * @default true
+   */
+  attachFileToBody?: boolean;
+```
+## added interface
+```typescript
+  /**file cached in memory as buffer */
+  export interface FastifyBufferFile {
+    fieldname: string,
+    filename: string,
+    encoding: string,
+    mimetype: string,
+    size?: number,
+    limit: boolean,
+    data?: Buffer
+  }
+  /**file cached in local disk */
+  export interface FastifyDiskFile {
+    fieldname: string,
+    filename: string,
+    encoding: string,
+    mimetype: string,
+    size?: number,
+    limit: boolean,
+    filepath?: string,
+    error?: string,
+  }
+```
+&emsp;
+&emsp;
+***
+The following is the original content of @fastify/multipart
+***
+&emsp;
 
 Fastify plugin to parse the multipart content-type. Supports:
 

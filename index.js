@@ -4,7 +4,7 @@ const Busboy = require('@fastify/busboy')
 const os = require('os')
 const fp = require('fastify-plugin')
 const eos = require('end-of-stream')
-const { createWriteStream } = require('fs')
+const { createWriteStream, existsSync, mkdirSync, writeFileSync } = require('fs')
 const { unlink } = require('fs').promises
 const path = require('path')
 const hexoid = require('hexoid')
@@ -29,6 +29,8 @@ const InvalidMultipartContentTypeError = createError('FST_INVALID_MULTIPART_CONT
 const InvalidJSONFieldError = createError('FST_INVALID_JSON_FIELD_ERROR', 'a request field is not a valid JSON as declared by its Content-Type', 406)
 const FileBufferNotFoundError = createError('FST_FILE_BUFFER_NOT_FOUND', 'the file buffer was not found', 500)
 
+const toID = hexoid()
+
 function setMultipart (req, payload, done) {
   // nothing to do, it will be done by the Request.multipart object
   req.raw[kMultipart] = true
@@ -43,17 +45,19 @@ function attachToBody (options, req, reply, next) {
 
   const consumerStream = options.onFile || defaultConsumer
   const body = {}
+  const requestFiles = []
   const mp = req.multipart((field, file, filename, encoding, mimetype) => {
     body[field] = body[field] || []
     body[field].push({
       data: [],
+      fieldname: field,
       filename,
       encoding,
       mimetype,
       limit: false
     })
 
-    const result = consumerStream(field, file, filename, encoding, mimetype, body)
+    const result = consumerStream(field, file, filename, encoding, mimetype, body, options, requestFiles)
     if (result && typeof result.then === 'function') {
       result.catch((err) => {
         // continue with the workflow
@@ -63,6 +67,16 @@ function attachToBody (options, req, reply, next) {
     }
   }, function (err) {
     if (!err) {
+      req.requestFiles = requestFiles
+      if (requestFiles.length && options?.addToBody && options?.attachFileToBody !== false) {
+        const fileFields = requestFiles.map(ele => ele.fieldname)
+        for (const fileField of fileFields) {
+          if (fileField) {
+            req[fileField] = body[fileField]
+            delete body[fileField]
+          }
+        }
+      }
       req.body = body
     }
     next(err)
@@ -83,17 +97,37 @@ function attachToBody (options, req, reply, next) {
   })
 }
 
-function defaultConsumer (field, file, filename, encoding, mimetype, body) {
+function defaultConsumer (field, file, filename, encoding, mimetype, body, options, requestFiles) {
   const fileData = []
   const lastFile = body[field][body[field].length - 1]
   file.on('data', data => { if (!lastFile.limit) { fileData.push(data) } })
   file.on('limit', () => { lastFile.limit = true })
   file.on('end', () => {
     if (!lastFile.limit) {
-      lastFile.data = Buffer.concat(fileData)
+      const buffer = Buffer.concat(fileData)
+      lastFile.size = buffer.length
+      if (options?.cacheLocation === 'disk') {
+        const dir = path.join(os.tmpdir(), 'fastify-multipart')
+        if (!existsSync(dir)) { mkdirSync(dir) }
+        const filepath = path.join(dir, toID() + path.extname(filename))
+        try {
+          writeFileSync(filepath, buffer)
+          lastFile.filepath = filepath
+        } catch (error) {
+          lastFile.error = 'error when write to disk'
+        }
+        delete lastFile.data
+      } else {
+        lastFile.data = buffer
+      }
     } else {
-      lastFile.data = undefined
+      if (options?.cacheLocation === 'disk') {
+        delete lastFile.data
+      } else {
+        lastFile.data = undefined
+      }
     }
+    requestFiles.push(lastFile)
   })
 }
 
@@ -221,8 +255,6 @@ function fastifyMultipart (fastify, options, done) {
   fastify.addHook('onResponse', async (request, reply) => {
     await request.cleanRequestFiles()
   })
-
-  const toID = hexoid()
 
   function isMultipart () {
     return this.raw[kMultipart] || false
@@ -577,14 +609,22 @@ function fastifyMultipart (fastify, options, done) {
   }
 
   async function cleanRequestFiles () {
-    if (!this.tmpUploads) {
-      return
+    if (this.tmpUploads?.length) {
+      for (const filepath of this.tmpUploads) {
+        try {
+          await unlink(filepath)
+        } catch (error) {
+          this.log.error(error, 'could not delete file')
+        }
+      }
     }
-    for (const filepath of this.tmpUploads) {
-      try {
-        await unlink(filepath)
-      } catch (error) {
-        this.log.error(error, 'could not delete file')
+    if (this.requestFiles?.length) {
+      for (const fileObj of this.requestFiles) {
+        try {
+          if (fileObj?.filepath) { await unlink(fileObj.filepath) }
+        } catch (error) {
+          this.log.error(error, 'could not delete file')
+        }
       }
     }
   }
@@ -628,7 +668,7 @@ function fastifyMultipart (fastify, options, done) {
  */
 module.exports = fp(fastifyMultipart, {
   fastify: '4.x',
-  name: '@fastify/multipart'
+  name: '@iimm/fastify-multipart'
 })
 module.exports.default = fastifyMultipart
 module.exports.fastifyMultipart = fastifyMultipart

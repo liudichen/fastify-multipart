@@ -107,7 +107,39 @@ declare namespace fastifyMultipart {
     [fieldname: string]: Multipart | Multipart[] | undefined;
   }
 
+  /**file cached in memory as buffer */
+  export interface FastifyBufferFile {
+    fieldname: string,
+    filename: string,
+    encoding: string,
+    mimetype: string,
+    size?: number,
+    /**limit=true时说明超限出错了 */
+    limit: boolean,
+    data?: Buffer
+  }
+  /**file cached in local disk */
+  export interface FastifyDiskFile {
+    fieldname: string,
+    filename: string,
+    encoding: string,
+    mimetype: string,
+    size?: number,
+    /**limit=true时说明超限出错了 */
+    limit: boolean,
+    filepath?: string,
+    error?: string,
+  }
+
   export interface FastifyMultipartBaseOptions {
+    /**file cache store mode: memory/disk(when is disk,files will be auto-resumed and save at lock tmp dir, fileItem object will have a property named 'filepath')
+     * @default 'memory'
+     */
+    mode?: 'disk' | 'memory';
+    /**files fields attach to body?(only valid when addToBody=true). when is not false, file fields will be add into body,otherwise they will be add into request with their field name？
+     * @default true
+     */
+    attachFileToBody?: boolean;
     /**
      * Append the multipart parameters to the body object
      */
