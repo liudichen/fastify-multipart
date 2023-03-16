@@ -49,7 +49,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/liudichen/fastify-multipart/tree/iimm"
+    "url": "git+https://github.com/liudichen/fastify-multipart.git"
   },
   "keywords": [
     "fastify",
@@ -57,7 +57,7 @@
     "form"
   ],
   "author": "liudichen <liudichen@foxmail.com>",
-  "homepage": "https://github.com/liudichen/fastify-multipart/tree/iimm",
+  "homepage": "https://github.com/liudichen/fastify-multipart",
   "license": "MIT",
   "tsd": {
     "directory": "test"
