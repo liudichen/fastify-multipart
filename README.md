@@ -3,7 +3,7 @@
 [![NPM version](https://img.shields.io/npm/v/@iimm/fastify-multipart.svg?style=flat)](https://www.npmjs.com/package/@iimm/fastify-multipart)
 [![NPM downloads](http://img.shields.io/npm/dm/@iimm/fastify-multipart.svg?style=flat)](https://npmjs.org/package/@iimm/fastify-multipart)
 
-Fastify plugin to parse the multipart content-type. Originly fork from [`@fastify/multipart`](https://github.com/fastify/fastify-multipart) and then add built-in disk mode.
+Fastify plugin to parse the multipart content-type. Originly fork from [`@fastify/multipart`](https://github.com/fastify/fastify-multipart) and then add built-in disk cache mode.
 
 ## Version Comparison
 
@@ -11,6 +11,10 @@ Fastify plugin to parse the multipart content-type. Originly fork from [`@fastif
 | :----:|:----:|
 |1.0.0|7.5.0|
 
+## Install
+```sh
+npm i @iimm/fastify-multipart
+```
 
 ## added options
 ```javascript
