@@ -73,7 +73,7 @@ function attachToBody (options, req, reply, next) {
         for (const fileField of fileFields) {
           if (fileField) {
             req[fileField] = body[fileField]
-            if (options?.attachFieldsToBody === false) {
+            if (options?.attachFileToBody === false) {
               delete body[fileField]
             }
           }
