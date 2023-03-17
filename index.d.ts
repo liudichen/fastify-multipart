@@ -135,7 +135,7 @@ declare namespace fastifyMultipart {
     /**file cache store mode: memory/disk(when is disk,files will be auto-resumed and save at lock tmp dir, fileItem object will have a property named 'filepath')
      * @default 'memory'
      */
-    mode?: 'disk' | 'memory';
+    cacheLocation?: 'disk' | 'memory';
     /**files fields attach to body?(only valid when addToBody=true). when is not false, file fields will be add into body,otherwise they will be add into request with their field name？
      * @default true
      */
