@@ -9,12 +9,13 @@ Fastify plugin to parse the multipart content-type. Originly fork from [`@fastif
 
 | @iimm/fastify-multipart | @fastify/multipart |
 | :----:|:----:|
-|1.0.0~1.0.1|7.5.0|
+|1.0.0~1.0.2|7.5.0|
 
 ## Install
 ```sh
 npm i @iimm/fastify-multipart
 ```
+When addToBoby=true, files always can be found in request[fieldName], and all files always can be found in request.requestFiles
 
 ## added options
 ```javascript
