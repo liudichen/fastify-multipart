@@ -136,7 +136,7 @@ declare namespace fastifyMultipart {
      * @default 'memory'
      */
     cacheLocation?: 'disk' | 'memory';
-    /**files fields attach to body?(only valid when addToBody=true). when is not false, file fields will be add into body,otherwise they will be add into request with their field name？
+    /**files fields attach to body?(only valid when addToBody=true). when is not false, file fields will be add into body and request,otherwise they will be add into request with their field name？
      * @default true
      */
     attachFileToBody?: boolean;
