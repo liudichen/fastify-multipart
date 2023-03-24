@@ -1,5 +1,5 @@
 import { Busboy, BusboyConfig, BusboyFileStream } from "@fastify/busboy";
-import { FastifyPluginCallback } from "fastify";
+import { FastifyPluginCallback, FastifyRequest } from "fastify";
 import { Readable } from "stream";
 import { FastifyErrorConstructor } from "@fastify/error";
 
@@ -218,7 +218,10 @@ declare namespace fastifyMultipart {
       filename: string,
       encoding: string,
       mimetype: string,
-      body: Record<string, BodyEntry>
+      body: Record<string, BodyEntry>,
+      options: FastifyMultipartBaseOptions,
+      requestFiles: FastifyBufferFile[] | FastifyDiskFile[],
+      req: FastifyRequest
     ) => void | Promise<void>;
   }
 

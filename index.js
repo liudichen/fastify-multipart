@@ -57,7 +57,7 @@ function attachToBody (options, req, reply, next) {
       limit: false
     })
 
-    const result = consumerStream(field, file, filename, encoding, mimetype, body, options, requestFiles)
+    const result = consumerStream(field, file, filename, encoding, mimetype, body, options, requestFiles, req)
     if (result && typeof result.then === 'function') {
       result.catch((err) => {
         // continue with the workflow
@@ -99,7 +99,7 @@ function attachToBody (options, req, reply, next) {
   })
 }
 
-function defaultConsumer (field, file, filename, encoding, mimetype, body, options, requestFiles) {
+function defaultConsumer (field, file, filename, encoding, mimetype, body, options, requestFiles, req) {
   const fileData = []
   const lastFile = body[field][body[field].length - 1]
   file.on('data', data => { if (!lastFile.limit) { fileData.push(data) } })

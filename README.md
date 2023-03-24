@@ -27,6 +27,18 @@ When addToBoby=true, files always can be found in request[fieldName], and all fi
    * @default true
    */
   attachFileToBody?: boolean;
+  /**and several parameters*/
+  onFile?: (
+      fieldName: string,
+      stream: Readable,
+      filename: string,
+      encoding: string,
+      mimetype: string,
+      body: Record<string, BodyEntry>,
+      options: FastifyMultipartBaseOptions,
+      requestFiles: FastifyBufferFile[] | FastifyDiskFile[],
+      req: FastifyRequest
+    ) => void | Promise<void>;
 ```
 ## added interface
 ```typescript
