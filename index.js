@@ -45,7 +45,7 @@ function attachToBody (options, req, reply, next) {
 
   const consumerStream = options.onFile || defaultConsumer
   const body = {}
-  const requestFiles = []
+  req.requestFiles = []
   const mp = req.multipart((field, file, filename, encoding, mimetype) => {
     body[field] = body[field] || []
     body[field].push({
@@ -56,8 +56,7 @@ function attachToBody (options, req, reply, next) {
       mimetype,
       limit: false
     })
-
-    const result = consumerStream(field, file, filename, encoding, mimetype, body, options, requestFiles, req)
+    const result = consumerStream.call(req, field, file, filename, encoding, mimetype, body, options)
     if (result && typeof result.then === 'function') {
       result.catch((err) => {
         // continue with the workflow
@@ -67,9 +66,8 @@ function attachToBody (options, req, reply, next) {
     }
   }, function (err) {
     if (!err) {
-      req.requestFiles = requestFiles
-      if (requestFiles.length && options?.addToBody) {
-        const fileFields = requestFiles.map(ele => ele.fieldname)
+      if (req.requestFiles.length && options?.addToBody) {
+        const fileFields = req.requestFiles.map(ele => ele.fieldname)
         for (const fileField of fileFields) {
           if (fileField) {
             req[fileField] = body[fileField]
@@ -99,8 +97,9 @@ function attachToBody (options, req, reply, next) {
   })
 }
 
-function defaultConsumer (field, file, filename, encoding, mimetype, body, options, requestFiles, req) {
+function defaultConsumer (field, file, filename, encoding, mimetype, body, options) {
   const fileData = []
+
   const lastFile = body[field][body[field].length - 1]
   file.on('data', data => { if (!lastFile.limit) { fileData.push(data) } })
   file.on('limit', () => { lastFile.limit = true })
@@ -129,7 +128,7 @@ function defaultConsumer (field, file, filename, encoding, mimetype, body, optio
         lastFile.data = undefined
       }
     }
-    requestFiles.push(lastFile)
+    this.requestFiles.push(lastFile)
   })
 }
 
@@ -193,7 +192,8 @@ function fastifyMultipart (fastify, options, done) {
         req.body = part.fields
         if (part.file) {
           if (options.onFile) {
-            await options.onFile(part)
+            // await options.onFile(part)
+            await options.onFile.call(req, part)
           } else {
             await part.toBuffer()
           }

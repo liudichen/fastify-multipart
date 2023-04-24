@@ -1,6 +1,6 @@
 {
   "name": "@iimm/fastify-multipart",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "Multipart plugin for Fastify,(originly forked from '@fastify/multipart)",
   "main": "index.js",
   "types": "index.d.ts",

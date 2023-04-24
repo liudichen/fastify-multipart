@@ -213,6 +213,7 @@ declare namespace fastifyMultipart {
      * Manage the file stream like you need
      */
     onFile?: (
+      this: FastifyRequest,
       fieldName: string,
       stream: Readable,
       filename: string,
@@ -220,8 +221,6 @@ declare namespace fastifyMultipart {
       mimetype: string,
       body: Record<string, BodyEntry>,
       options: FastifyMultipartBaseOptions,
-      requestFiles: FastifyBufferFile[] | FastifyDiskFile[],
-      req: FastifyRequest
     ) => void | Promise<void>;
   }
 
@@ -235,7 +234,7 @@ declare namespace fastifyMultipart {
     /**
      * Manage the file stream like you need
      */
-    onFile?: (part: MultipartFile) => void | Promise<void>;
+    onFile?: (this: FastifyRequest,part: MultipartFile) => void | Promise<void>;
   }
 
   export const fastifyMultipart: FastifyMultipartPlugin;
