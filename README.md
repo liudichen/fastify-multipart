@@ -30,6 +30,7 @@ When addToBoby=true, files always can be found in request[fieldName], and all fi
   attachFileToBody?: boolean;
   /**and several parameters*/
   onFile?: (
+      this: FastifyRequest,
       fieldName: string,
       stream: Readable,
       filename: string,
@@ -37,8 +38,6 @@ When addToBoby=true, files always can be found in request[fieldName], and all fi
       mimetype: string,
       body: Record<string, BodyEntry>,
       options: FastifyMultipartBaseOptions,
-      requestFiles: FastifyBufferFile[] | FastifyDiskFile[],
-      req: FastifyRequest
     ) => void | Promise<void>;
 ```
 ## added interface
