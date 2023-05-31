@@ -10,7 +10,7 @@ Fastify plugin to parse the multipart content-type. Originly fork from [`@fastif
 | @iimm/fastify-multipart | @fastify/multipart |
 | :----:|:----:|
 |1.0.0~1.0.4|7.5.0|
-|1.1.0~|7.6.0|
+|1.1.x~|7.6.0|
 
 ## Install
 ```sh

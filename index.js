@@ -70,9 +70,12 @@ function attachToBody (options, req, reply, next) {
         const fileFields = req.requestFiles.map(ele => ele.fieldname)
         for (const fileField of fileFields) {
           if (fileField) {
-            req[fileField] = body[fileField]
+            const files = req.requestFiles.filter(ele => ele.fieldname === fileField)
+            req[fileField] = files
             if (options?.attachFileToBody === false) {
               delete body[fileField]
+            } else {
+              body[fileField] = files
             }
           }
         }
